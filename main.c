@@ -255,17 +255,55 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
         }
         *flag = 1;
         // printAll(*head);
-        *count_p = count;
+        // printf("%d\n", count);
+        *count_p = count / 7;
+        // printf("%d\n", *count_p);
     }
 }
 
+void printExactNode(struct node* head, char *typIN, int *counter){
+    // printf("%d\n", *count_p);
+    struct node* tmp_t = head;
+    if(strcmp(tmp_t->udaje.typ, typIN) == 0){
+        if(head != NULL){
+            printf("%d.\n", *counter);
+            struct node_mena* tmp = head -> udaje.meno;
+            int nameCount = 1;
+            printf("ID cislo: %d\n", head->udaje.id);
+            printf("Nazov prispevku: %s\n", head->udaje.nazov_prednasky);
+            printf("Mena autorov:\n");
+            while(tmp != NULL){
+                printf("    %d: %s %s\n", nameCount, tmp -> logs.meno, tmp -> logs.priezvisko);
+                nameCount++;
+                tmp = tmp -> next;
+            }
+            printf("Typ prezentovania: %s\n", head->udaje.typ);
+            printf("Cas prezentovania: %s\n", head->udaje.cas);
+            printf("Datum: %s\n", head->udaje.datum);
+            printf("\n");
+            *counter = *counter+ 1;
+        }
 
+    }
+}
+
+void funkcia_h(struct node* head){
+    char typIN[3];
+    int i = 1;
+    printf("Zadaj typ: ");
+    scanf(" %[^\n]", typIN);
+    typIN[strcspn(typIN, "\n")] = 0;
+    while (head!= NULL){
+        printExactNode(head, typIN, &i);
+        head = head -> next;
+    }
+}
 
 int main(){
     FILE *organized_stuff = NULL;
     struct node *head = NULL;
 
-    // struct PRISPEVOK **current = NULL;
+
 
     int counts = 0;
     int *count_p;
@@ -284,7 +322,9 @@ int main(){
         } else if (operative == 's'){
 
         } else if (operative == 'h') {
-
+            funkcia_h(head);
+            // char typIN[3] = "UD\0";
+            // printExactNode(head, typIN, count_p);
         } else if (operative == 'z'){
 
         } else if (operative == 'p') {
