@@ -39,10 +39,8 @@ void printNode(struct node* head){
         printf("Nazov prispevku: %s\n", head->udaje.nazov_prednasky);
         printf("Mena autorov:\n");
         while(tmp != NULL){
-            // printf("===== AUTOR =====\n\n");
             printf("    %d: %s %s\n", nameCount, tmp -> logs.meno, tmp -> logs.priezvisko);
             nameCount++;
-            // printf("\n%s %s\n", tmp->logs.meno, tmp->logs.priezvisko);
             tmp = tmp -> next;
         }
         printf("Typ prezentovania: %s\n", head->udaje.typ);
@@ -52,20 +50,35 @@ void printNode(struct node* head){
     }
 }
 
-void printAll(struct node* head){
-
+void funkcia_v(struct node* head){ // FUNKCIA_V
+    int i = 1;
     while (head != NULL) {
+        printf("%d.\n", i);
         printNode(head);
+        i++;
         head = head->next;
     }
 }
 
-
 void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_p){
     *organized_stuff = fopen("./OrganizacnePodujatia2.txt", "r");
-    if(!organized_stuff){
+    if(!(*organized_stuff)){
         printf("Subor sa nepodarilo otvorit\n");
     }else {
+        // if(*flag == 1){
+        //     struct node* tmp = *head;
+        //         while(head != NULL){
+        //             struct node_mena* structmeno = *head -> udaje.meno;
+        //             struct node_mena* tmp_m = NULL;
+        //             while(structmeno != NULL){
+        //                 tmp_m = structmeno;
+        //                 structmeno = structmeno -> next;
+        //                 free(tmp_m);
+        //             }
+        //             tmp = *head;
+        //             head = *head -> next;
+        //             free(tmp);
+        // }
         char*sp, *ssp;
         char line[1024], tmp_s[1024], tmp_meno[1024], tmp_priezvisko[1024];
         int count = 0, count_m = 0, count_has = 0, indx_m_one = 0, count_names_struct = 1;
@@ -98,7 +111,7 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
                         count_has++; // pocitanie # a.k.a. pocet mien v line
                     }
                 }
-                    printf("===========Cely riadok: %s===============\n", line);
+                    // printf("===========Cely riadok: %s===============\n", line);
                 int p = 0;
                 count_names_struct = 1;
                 if(count_has){
@@ -137,15 +150,15 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
                                     tmp_priezvisko[j - indx_m_one + 1] = '\0';
                                 }
                             }
-                            printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
+                            // printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
                             
 
                             if(count_names_struct>1){
-                                printf(".....%d......\n", p);
+                                // printf(".....%d......\n", p);
                                 meno_log -> next = (struct node_mena*) malloc (sizeof(struct node_mena));
                                 meno_log = meno_log -> next;
                                 meno_log -> next = NULL;
-                                printf("......%d......\n", p);
+                                // printf("......%d......\n", p);
                                 p++;
                             }
                             strcpy(meno_log->logs.meno, tmp_meno);
@@ -199,7 +212,7 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
                                     // printf("%s tmps: %s \n", tmp_priezvisko, tmp_s);
                                 }
                             }
-                            printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
+                            // printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
                         strcpy(meno_log->logs.meno, tmp_meno);
                         strcpy(meno_log->logs.priezvisko, tmp_priezvisko);
                         for(int k = 0; k < strlen(tmp_s); k++){
@@ -241,10 +254,13 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
 
         }
         *flag = 1;
-        printAll(*head);
+        // printAll(*head);
         *count_p = count;
     }
 }
+
+
+
 int main(){
     FILE *organized_stuff = NULL;
     struct node *head = NULL;
@@ -260,7 +276,7 @@ int main(){
     while(1){
         scanf("%c", &operative);
         if(operative == 'v'){
-
+            funkcia_v(head);
             continue;
         } else if(operative == 'o'){
         } else if(operative == 'n'){
