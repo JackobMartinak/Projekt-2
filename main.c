@@ -3,9 +3,9 @@
 #include <string.h>
 
 typedef struct{
-    char meno[150];
-    char priezvisko[150];
-    
+    char meno[250];
+    char priezvisko[250];
+
 } MENO;
 
 struct node_mena {
@@ -16,7 +16,7 @@ struct node_mena {
 typedef struct prispevok
 {
     int id;
-    char nazov_prednasky[256];
+    char nazov_prednasky[1024];
     struct node_mena* meno;
     char typ[3];
     char cas[5];
@@ -30,29 +30,45 @@ struct node {
 };
 
 
+void printNode(struct node* head){
 
-void printAll(struct node*head){
-    int i = 1;
-    while(head != NULL){
-        printf("%d.\n", i);
-        printf("ID: %d\n", head -> udaje.id);
-        printf("NAZOV: %s\n", head -> udaje.nazov_prednasky);
-        printf("TYP: %s\n", head -> udaje.typ);
-        printf("CAS: %s\n", head -> udaje.cas);
-        printf("DATUM: %s\n", head -> udaje.datum);
-        head = head ->next;
-        i++;
+    if(head != NULL){
+        struct node_mena* tmp = head -> udaje.meno;
+        int nameCount = 1;
+        printf("ID cislo: %d\n", head->udaje.id);
+        printf("Nazov prispevku: %s\n", head->udaje.nazov_prednasky);
+        printf("Mena autorov:\n");
+        while(tmp != NULL){
+            // printf("===== AUTOR =====\n\n");
+            printf("    %d: %s %s\n", nameCount, tmp -> logs.meno, tmp -> logs.priezvisko);
+            nameCount++;
+            // printf("\n%s %s\n", tmp->logs.meno, tmp->logs.priezvisko);
+            tmp = tmp -> next;
+        }
+        printf("Typ prezentovania: %s\n", head->udaje.typ);
+        printf("Cas prezentovania: %s\n", head->udaje.cas);
+        printf("Datum: %s\n", head->udaje.datum);
+        printf("\n");
     }
 }
+
+void printAll(struct node* head){
+
+    while (head != NULL) {
+        printNode(head);
+        head = head->next;
+    }
+}
+
 
 void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_p){
     *organized_stuff = fopen("./OrganizacnePodujatia2.txt", "r");
     if(!organized_stuff){
         printf("Subor sa nepodarilo otvorit\n");
     }else {
-        char*sp;
-        char line[1024];
-        int count = 0;
+        char*sp, *ssp;
+        char line[1024], tmp_s[1024], tmp_meno[1024], tmp_priezvisko[1024];
+        int count = 0, count_m = 0, count_has = 0, indx_m_one = 0, count_names_struct = 1;
         rewind(*organized_stuff); // ak uz bol otvoreny nastavi kurzor na zaciatok suboru
         (*head) = (struct node*) malloc(sizeof(struct node));
         struct node_mena *meno_log = (struct node_mena*) malloc(sizeof(struct node_mena));
@@ -77,7 +93,131 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
             }
             if(count % 7 == 3){
               // MENO
-                printf("\n%s\n", line);
+                for(int j = 0; j < strlen(line); j++){
+                    if(line[j] == '#'){
+                        count_has++; // pocitanie # a.k.a. pocet mien v line
+                    }
+                }
+                    printf("===========Cely riadok: %s===============\n", line);
+                int p = 0;
+                count_names_struct = 1;
+                if(count_has){
+                    ssp = strtok(line, "#"); // rozdeli mena podla #
+                    // printf("%s\n", ssp);
+                    while(ssp != NULL){
+
+
+
+                        strcpy(tmp_s, ssp);
+                        for(int i = 0; i < strlen(tmp_s); i++){
+                            if(tmp_s[i] == ' '){
+                                if(count_m == 0){
+                                    count_m++;
+                                    indx_m_one = i;
+                                } else if(count_m == 1){
+                                    count_m++;
+                                }
+
+                            }
+                        }
+
+
+
+
+                        // printf("tmp_s : %s\n", tmp_s);
+                        if(count_m){
+                            // printf("TRUE\n");
+                            for(int j = 0; j < strlen(tmp_s); j++){
+                                if(j < indx_m_one){
+                                    tmp_meno[j] = tmp_s[j];
+                                    tmp_meno[j+1] = '\0';
+                                    //printf("%s tmps: %s\n", tmp_meno, tmp_s);
+                                } else {
+                                    tmp_priezvisko[j - indx_m_one] = tmp_s[j];
+                                    tmp_priezvisko[j - indx_m_one + 1] = '\0';
+                                }
+                            }
+                            printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
+                            
+
+                            if(count_names_struct>1){
+                                printf(".....%d......\n", p);
+                                meno_log -> next = (struct node_mena*) malloc (sizeof(struct node_mena));
+                                meno_log = meno_log -> next;
+                                meno_log -> next = NULL;
+                                printf("......%d......\n", p);
+                                p++;
+                            }
+                            strcpy(meno_log->logs.meno, tmp_meno);
+                            strcpy(meno_log->logs.priezvisko, tmp_priezvisko);
+                            count_names_struct++;
+
+                            for(int k = 0; k < strlen(tmp_s); k++){
+                                if(k < indx_m_one){
+                                    tmp_meno[k] = 0;
+                                } else {
+                                    tmp_priezvisko[k - indx_m_one] = 0;
+                                }
+                            }
+                        }
+
+                        count_m = 0;
+                        indx_m_one = 0;
+                        // count_names_struct = 0;
+                        ssp = strtok(NULL, "#");
+
+                    }
+                    // rozdelim najprv string po #
+                    // Nasledne po Medzerach
+                    // po prvej medzere je uz vsetko priezvisko
+                  // count_names_struct = 0;
+                } else {
+                    strcpy(tmp_s, line);
+                    for(int i = 0; i < strlen(tmp_s); i++){
+                        if(tmp_s[i] == ' '){
+                                if(count_m == 0){
+                                    count_m++;
+                                    indx_m_one = i;
+                                } else if(count_m == 1){
+                                    count_m++;
+                                }
+
+                            }
+                    }
+                    if(count_m){
+                        // printf("TRUE\n");
+                        for(int j = 0; j < strlen(tmp_s); j++){
+                                if(j < indx_m_one){
+                                    tmp_meno[j] = tmp_s[j];
+                                    tmp_meno[j+1] = '\0';
+                                    // printf("%s tmps: %s\n" , tmp_meno, tmp_s);
+                                    // printf("%d\n", indx_m_one);
+                                } else {
+                                    tmp_priezvisko[j - indx_m_one] = tmp_s[j];
+                                    tmp_priezvisko[j - indx_m_one + 1] = '\0';
+                                    // printf("%d\n", indx_m_one);
+                                    // printf("%s tmps: %s \n", tmp_priezvisko, tmp_s);
+                                }
+                            }
+                            printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
+                        strcpy(meno_log->logs.meno, tmp_meno);
+                        strcpy(meno_log->logs.priezvisko, tmp_priezvisko);
+                        for(int k = 0; k < strlen(tmp_s); k++){
+                            if(k < indx_m_one){
+                                tmp_meno[k] = 0;
+                            } else {
+                                tmp_priezvisko[k - indx_m_one] = 0;
+                            }
+                        }
+                    }
+                    count_m = 0;
+                    indx_m_one = 0;
+                    count_names_struct = 1;
+                    // # sa nenachadza cize ide o jedno meno
+                    // Rozdelim ho po medzerach
+                    // po prvej medzere je uz vsetko Priezvisko
+                }
+                count_has = 0;
             }
             if(count % 7 == 4){
                 strcpy(it -> udaje.typ, line);
@@ -90,6 +230,7 @@ void funkcia_n(FILE** organized_stuff, struct node**head ,int *flag, int *count_
             }
             if(count % 7 == 0 && count != 0){
                 it -> next = (struct node*)malloc(sizeof(struct node));
+
                 it = it -> next;
                 it -> next = NULL;
                 meno_log = (struct node_mena*) malloc(sizeof(struct node_mena));
@@ -109,38 +250,36 @@ int main(){
     struct node *head = NULL;
 
     // struct PRISPEVOK **current = NULL;
-    
-    int counts = 0, county = 0;
-    int *count_p, *county_p;
+
+    int counts = 0;
+    int *count_p;
     char operative;
     int flag = 0;
     int *flag_p = &flag;
     count_p = &counts;
-    county_p = &county;
     while(1){
         scanf("%c", &operative);
         if(operative == 'v'){
-            
+
             continue;
         } else if(operative == 'o'){
-            
         } else if(operative == 'n'){
             funkcia_n(&organized_stuff, &head, flag_p, count_p);
         } else if (operative == 's'){
-            
+
         } else if (operative == 'h') {
-            
+
         } else if (operative == 'z'){
-            
+
         } else if (operative == 'p') {
-            
+
         } else if(operative == 'i'){
-            
+
         } else if(operative == 'y'){
 
         } else if(operative == 'l'){
         }
-        
+
         else if (operative == 'k'){
             if(organized_stuff != NULL){ // ak je subor otvoreny tak ho zavrie
                 fclose(organized_stuff);
