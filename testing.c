@@ -78,7 +78,7 @@ int main()
         printAll(head);
         printf("======\n");
         // removeAt(2, &head);
-        // printAll(head);
+        // printAll(head);sa sad
 
     return 0;
 }
