@@ -288,6 +288,7 @@ void printExactNode(struct node* head, char *typIN, int *counter){
     } 
 }
 
+
 void funkcia_h(struct node* head){
     char typIN[3];
     int i = 0;
@@ -303,6 +304,197 @@ void funkcia_h(struct node* head){
     }
 }
 
+
+struct node* elementAt(int* idx, struct node* head){
+    int index = 0;
+    while(head != NULL){
+        if(index == *idx - 1){
+            return head;
+        }
+        index++;
+        head = head -> next;
+    }
+}
+
+void funkcia_p(struct node** head, int* indx, int *flag_p){
+    int id = 0, count_has = 0, count_m = 0, indx_m_one = 0, count_names_struct = 1; 
+    char nazov_predna[1024], typ[3], cas[5], datum[10], tmp_s[1024], tmp_meno[1024], tmp_priezvisko[1024];;
+    char tmp_autori[1024], *sp;
+    struct node* new_node = (struct node*) malloc(sizeof(struct node));
+    struct node_mena *meno_log_new = (struct node_mena*) malloc(sizeof(struct node_mena));
+    meno_log_new -> next = NULL;
+    new_node -> udaje.meno = meno_log_new;
+    new_node -> next = NULL;
+    if(*flag_p == 0){
+        *flag_p = 1;
+    }
+    scanf(" %d", &id);
+        scanf(" %[^\n]", nazov_predna);
+        scanf(" %[^\n]", tmp_autori);
+        scanf(" %[^\n]", typ);
+        scanf(" %[^\n]", cas);
+        scanf(" %[^\n]", datum);
+        if(id % 15 != 0){
+            printf("Neplatne ID!.\n");
+            return;
+        }
+        nazov_predna[strcspn(nazov_predna, "\n")] = 0;
+        tmp_autori[strcspn(tmp_autori, "\n")] = 0;
+        typ[strcspn(typ, "\n")] = 0;
+        cas[strcspn(cas, "\n")] = 0;
+        datum[strcspn(datum, "\n")] = 0;
+
+        printf("%d\n %s\n %s \n %s\n %s\n %s\n", id, nazov_predna, tmp_autori,typ,cas,datum);
+
+        // printf("%s", prev_node->udaje.nazov_prednasky);
+        
+        for(int j = 0; j < strlen(tmp_autori); j++){
+            if(tmp_autori[j] == '#'){
+                count_has++; // pocitanie # a.k.a. pocet mien v line
+            }
+        }
+        if(count_has){
+            sp = strtok(tmp_autori, "#");
+            strcpy(tmp_s, sp);
+            while (sp != NULL)
+            {
+                for(int i = 0; i < strlen(tmp_s); i++){
+                    if(tmp_s[i] == ' '){
+                        if(count_m == 0){
+                            count_m++;
+                            indx_m_one = i;
+                        }
+                    }
+                }
+                if(count_m){
+                    // printf("TRUE\n");
+                    for(int j = 0; j < strlen(tmp_s); j++){
+                        if(j < indx_m_one){
+                            tmp_meno[j] = tmp_s[j];
+                            tmp_meno[j+1] = '\0';
+                            //printf("%s tmps: %s\n", tmp_meno, tmp_s);
+                        } else {
+                            tmp_priezvisko[j - indx_m_one] = tmp_s[j];
+                            tmp_priezvisko[j - indx_m_one + 1] = '\0';
+                        }
+                    }
+                    // printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
+                    
+
+                    if(count_names_struct>1){
+                        // printf(".....%d......\n", p);
+                        meno_log_new -> next = (struct node_mena*) malloc (sizeof(struct node_mena));
+                        meno_log_new = meno_log_new -> next;
+                        meno_log_new -> next = NULL;
+                        // printf("......%d......\n", p);
+                        // p++;
+                    }
+                    strcpy(meno_log_new->logs.meno, tmp_meno);
+                    strcpy(meno_log_new->logs.priezvisko, tmp_priezvisko);
+                    count_names_struct++;
+
+                    for(int k = 0; k < strlen(tmp_s); k++){
+                        if(k < indx_m_one){
+                            tmp_meno[k] = 0;
+                        } else {
+                            tmp_priezvisko[k - indx_m_one] = 0;
+                        }
+                    }
+                }
+
+                count_m = 0;
+                indx_m_one = 0;
+                sp = strtok(NULL, "#");
+            }
+
+        } else {
+            strcpy(tmp_s, tmp_autori);
+                for(int i = 0; i < strlen(tmp_s); i++){
+                    if(tmp_s[i] == ' '){
+                            if(count_m == 0){
+                                count_m++;
+                                indx_m_one = i;
+                            } else if(count_m == 1){
+                                count_m++;
+                            }
+
+                        }
+                }
+                if(count_m){
+                    // printf("TRUE\n");
+                    for(int j = 0; j < strlen(tmp_s); j++){
+                            if(j < indx_m_one){
+                                tmp_meno[j] = tmp_s[j];
+                                tmp_meno[j+1] = '\0';
+                                // printf("%s tmps: %s\n" , tmp_meno, tmp_s);
+                                // printf("%d\n", indx_m_one);
+                            } else {
+                                tmp_priezvisko[j - indx_m_one] = tmp_s[j];
+                                tmp_priezvisko[j - indx_m_one + 1] = '\0';
+                                // printf("%d\n", indx_m_one);
+                                // printf("%s tmps: %s \n", tmp_priezvisko, tmp_s);
+                            }
+                        }
+                        // printf("MENO: %s PRIEZVISKO: %s\n", tmp_meno, tmp_priezvisko);
+                    strcpy(meno_log_new->logs.meno, tmp_meno);
+                    strcpy(meno_log_new->logs.priezvisko, tmp_priezvisko);
+                    for(int k = 0; k < strlen(tmp_s); k++){
+                        if(k < indx_m_one){
+                            tmp_meno[k] = 0;
+                        } else {
+                            tmp_priezvisko[k - indx_m_one] = 0;
+                        }
+                    }
+                }
+                count_m = 0;
+                indx_m_one = 0;
+                count_names_struct = 1;
+                // # sa nenachadza cize ide o jedno meno
+                // Rozdelim ho po medzerach
+                // po prvej medzere je uz vsetko Priezvisko
+            }
+            count_has = 0;
+
+        
+
+        new_node->udaje.id = id;
+        strcpy(new_node->udaje.nazov_prednasky, nazov_predna);
+        strcpy(new_node->udaje.typ, typ);
+        strcpy(new_node->udaje.cas, cas);
+        strcpy(new_node->udaje.datum, datum);
+
+    if(*indx == 1){
+        new_node->next = (*head);
+        (*head) = new_node;
+    }
+    struct node* prev_node = elementAt(indx, (*head));
+    
+    if(prev_node == NULL){
+        // prida sa na koniec
+        struct node *last = (*head);
+        new_node->next = NULL;
+        if ((*head) == NULL)
+        {
+            (*head) = new_node;
+            return;
+        }  
+        while (last->next != NULL)
+            last = last->next;
+        // 6. Change the next of last node 
+        last->next = new_node;
+        return;    
+        printf("Theres no node at %d index", *indx);
+        return;
+    }
+    if(*indx > 1){
+        
+        new_node->next = prev_node->next;
+        prev_node->next = new_node;
+    }
+    
+}
+
+
 int main(){
     FILE *organized_stuff = NULL;
     struct node *head = NULL;
@@ -310,6 +502,7 @@ int main(){
 
 
     int counts = 0;
+    int indx_p = 50;
     int *count_p;
     char operative;
     int flag = 0;
@@ -324,7 +517,7 @@ int main(){
         } else if(operative == 'n'){
             funkcia_n(&organized_stuff, &head, flag_p, count_p);
         } else if (operative == 's'){
-
+            
         } else if (operative == 'h') {
             funkcia_h(head);
             // char typIN[3] = "UD\0";
@@ -332,7 +525,8 @@ int main(){
         } else if (operative == 'z'){
 
         } else if (operative == 'p') {
-
+            scanf(" %d", &indx_p);
+            funkcia_p(&head, &indx_p, flag_p);
         } else if(operative == 'i'){
 
         } else if(operative == 'y'){
