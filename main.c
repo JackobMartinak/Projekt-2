@@ -265,6 +265,7 @@ void printExactNode(struct node* head, char *typIN, int *counter){
     // printf("%d\n", *count_p);
     struct node* tmp_t = head;
     if(strcmp(tmp_t->udaje.typ, typIN) == 0){
+        *counter = *counter+ 1;
         if(head != NULL){
             printf("%d.\n", *counter);
             struct node_mena* tmp = head -> udaje.meno;
@@ -281,21 +282,24 @@ void printExactNode(struct node* head, char *typIN, int *counter){
             printf("Cas prezentovania: %s\n", head->udaje.cas);
             printf("Datum: %s\n", head->udaje.datum);
             printf("\n");
-            *counter = *counter+ 1;
+            // *counter = *counter+ 1;
         }
 
-    }
+    } 
 }
 
 void funkcia_h(struct node* head){
     char typIN[3];
-    int i = 1;
+    int i = 0;
     printf("Zadaj typ: ");
     scanf(" %[^\n]", typIN);
     typIN[strcspn(typIN, "\n")] = 0;
     while (head!= NULL){
         printExactNode(head, typIN, &i);
         head = head -> next;
+    }
+    if(i == 0){
+        printf("Pre typ: %s nie su ziadne zaznamy.\n", typIN);
     }
 }
 
